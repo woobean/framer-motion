@@ -60,8 +60,8 @@ const Circle = styled(motion.div)`
 
 const boxVariants = {
   hover: (custom: string) => ({
-    originX: custom === "1" || custom === "3" ? 1 : 0,
-    originY: custom === "1" || custom === "2" ? 1 : 0,
+    originX: custom === "1" || custom === "3" ? "right" : "left",
+    originY: custom === "1" || custom === "2" ? "bottom" : "top",
     scale: 1.1,
   }),
 };
