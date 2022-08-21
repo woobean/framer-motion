@@ -1,123 +1,162 @@
-import styled from "styled-components";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
+import styled from "styled-components";
 
 const Wrapper = styled.div`
   height: 100vh;
   width: 100vw;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, #e09, #d0e);
   display: flex;
-  flex-direction: column;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
+  flex-direction: column;
+  position: relative;
+  padding: 0 50px;
 `;
 
 const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  width: 50vw;
-  gap: 10px;
+  grid-template-rows: 300px 300px;
+  gap: 15px;
+  max-width: 890px;
+  width: 100%;
 `;
 
 const Box = styled(motion.div)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 255, 255, 0.75);
-  border-radius: 8px;
-  height: 200px;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
-`;
-
-const Overlay = styled(motion.div)`
-  width: 100%;
-  height: 100%;
-  position: absolute;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-
-const Switch = styled.button<{ clicked: boolean }>`
-  background-color: white;
-  border: 0;
-  border-radius: 4px;
-  padding: 6px 8px;
   cursor: pointer;
-  transition: all 0.2s;
-  transform: ${(props) => (props.clicked ? "scale(1.15)" : "")};
-  font-size: 14px;
-  font-weight: bold;
-  color: ${(props) => (props.clicked ? "#dd3a3a" : "#2a63ff")};
 `;
 
 const Circle = styled(motion.div)`
   background-color: white;
-  height: 48px;
-  width: 48px;
-  border-radius: 24px;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4), 0 0px 5px rgba(0, 0, 0, 0.1);
 `;
 
+const Button = styled(motion.span)`
+  cursor: pointer;
+  padding: 10px;
+  margin-top: 50px;
+  border-radius: 5px;
+  color: white;
+  background-color: white;
+  font-weight: 600;
+  font-size: 18px;
+  position: absolute;
+  bottom: 75px;
+`;
+
+const Overlay = styled(motion.div)`
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+`;
+
+const BigBox = styled(motion.div)`
+  background-color: white;
+  width: 400px;
+  height: 300px;
+  border-radius: 10px;
+`;
+
+const buttonVariants = {
+  zero: {
+    color: "#0052D4",
+    transform: "scale(1)",
+  },
+  one: {
+    color: "#ff6a00",
+    transform: "scale(1.2)",
+  },
+};
+
 const boxVariants = {
-  hover: (custom: string) => ({
-    originX: custom === "1" || custom === "3" ? "right" : "left",
-    originY: custom === "1" || custom === "2" ? "bottom" : "top",
+  initial: (i: number) => ({
+    scale: 1,
+    x: 0,
+    y: 0,
+  }),
+  hover: (i: number) => ({
     scale: 1.1,
+    y: i ? -15 : 15,
+    x: i ? -20 : 20,
   }),
 };
 
-const overlay = {
-  hidden: { backgroundColor: "rgba(0, 0, 0, 0)" },
-  visible: { backgroundColor: "rgba(0, 0, 0, 0.5)" },
-  exit: { backgroundColor: "rgba(0, 0, 0, 0)" },
+const overlayVariants = {
+  hidden: {
+    backgroundColor: "rgba(0, 0, 0, 0.0)",
+  },
+  visible: {
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
 };
 
-function App() {
-  const [clicked, setClicked] = useState(false);
-  const toggleClicked = () => setClicked((prev) => !prev);
-  const [id, setId] = useState<null | string>(null);
+export default function App() {
+  const [index, setIndex] = useState(0);
+  const [selectedBox, setSelectedBox] = useState<string | null>(null);
+  const onToggleClick = () => {
+    setIndex((prev) => (prev === 1 ? 0 : 1));
+  };
+  const onClickBox = (i: string | null) => {
+    setSelectedBox(i);
+  };
   return (
     <Wrapper>
       <Grid>
-        {["1", "2", "3", "4"].map((n) => (
-          <Box
-            variants={boxVariants}
-            whileHover="hover"
-            onClick={() => setId(n)}
-            key={n}
-            layoutId={n}
-            custom={n}
-          >
-            {n === "2" && !clicked ? <Circle layoutId="circle" /> : null}
-            {n === "3" && clicked ? <Circle layoutId="circle" /> : null}
-          </Box>
-        ))}
+        <Box
+          onClick={() => onClickBox("1")}
+          layoutId="1"
+          variants={boxVariants}
+          custom={1}
+          initial="initial"
+          whileHover="hover"
+        />
+        <Box>{index === 0 ? <Circle layoutId="circle" /> : null}</Box>
+        <Box>{index === 1 ? <Circle layoutId="circle" /> : null}</Box>
+        <Box
+          onClick={() => onClickBox("0")}
+          variants={boxVariants}
+          custom={0}
+          layoutId="0"
+          initial="initial"
+          whileHover="hover"
+        />
       </Grid>
-      <AnimatePresence>
-        {id ? (
-          <Overlay
-            variants={overlay}
-            onClick={() => setId(null)}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-          >
-            <Box
-              layoutId={id}
-              style={{
-                width: 400,
-                height: 200,
-                backgroundColor: "rgba(255, 255, 255, 1)",
-              }}
-            />
-          </Overlay>
-        ) : null}
-      </AnimatePresence>
-      <Switch clicked={clicked} onClick={toggleClicked}>
+      <Button
+        animate={index === 1 ? "one" : "zero"}
+        variants={buttonVariants}
+        initial="zero"
+        onClick={onToggleClick}
+      >
         Switch
-      </Switch>
+      </Button>
+      <AnimatePresence>
+        {selectedBox ? (
+          <Overlay
+            variants={overlayVariants}
+            animate="visible"
+            exit="hidden"
+            onClick={() => onClickBox(null)}
+          >
+            <BigBox layoutId={selectedBox}></BigBox>
+          </Overlay>
+        ) : (
+          ""
+        )}
+      </AnimatePresence>
     </Wrapper>
   );
 }
-
-export default App;
